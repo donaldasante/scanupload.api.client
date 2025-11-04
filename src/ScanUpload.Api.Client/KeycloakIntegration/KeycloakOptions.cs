@@ -12,6 +12,7 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
         public string ClientSecret { get; set; } = string.Empty;
         public string? Scope { get; set; }
         public TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(30);
+        public int EarlyRefreshSeconds { get; set; } = 30;
 
         public string TokenEndpoint =>
             $"{ServerUrl.TrimEnd('/')}/realms/{Realm}/protocol/openid-connect/token";

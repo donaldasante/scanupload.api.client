@@ -37,12 +37,12 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
         public bool IsSuccess => !string.IsNullOrEmpty(AccessToken) && string.IsNullOrEmpty(Error);
         public DateTime ReceivedAtUtc { get; set; } = DateTime.UtcNow;
 
-        public bool IsExpired(DateTime? nowUtc = null)
+        public bool IsExpired(int earlyRefreshSeconds = 0, DateTime? nowUtc = null)
         {
             var now = nowUtc ?? DateTime.UtcNow;
+            var margin = Math.Max(0, earlyRefreshSeconds);
             // Consider a small safety margin
-            return now >= ReceivedAtUtc.AddSeconds(Math.Max(0, ExpiresIn - 10));
-            ;
+            return now >= ReceivedAtUtc.AddSeconds(Math.Max(0, ExpiresIn - margin));
         }
     }
 }

@@ -1,15 +1,30 @@
-﻿using ScanUpload.Api.Client.KeycloakIntegration;
+﻿using Microsoft.Extensions.DependencyInjection;
+using ScanUpload.Api.Client.KeycloakIntegration;
 
-var options = new KeycloakOptions
+// 1. Create service collection
+var services = new ServiceCollection();
+
+// 2. Configure KeycloakOptions
+services.Configure<KeycloakOptions>(opts =>
 {
-    ServerUrl = "https://identity.scanupload.net/",
-    Realm = "qa-scanupload-hub",
-    ClientId = "",
-    ClientSecret = "",
-    Scope = "openid profile email scanupload.hub",
-};
+    opts.ServerUrl = "https://identity.scanupload.net/";
+    opts.Realm = "qa-scanupload-hub";
+    opts.ClientId = "your-client-id";
+    opts.ClientSecret = "your-client-secret";
+    opts.Scope = "openid profile email scanupload.hub";
+    opts.EarlyRefreshSeconds = 30;
+});
 
-using var client = new KeycloakClient(options);
+services.AddHttpClient<KeycloakClient>().SetHandlerLifetime(TimeSpan.FromMinutes(5));
+
+// 3. Register KeycloakClient
+services.AddTransient<KeycloakClient>();
+
+// 4. Build provider
+var provider = services.BuildServiceProvider();
+
+// 5. Resolve and use KeycloakClient
+var client = provider.GetRequiredService<KeycloakClient>();
 
 try
 {

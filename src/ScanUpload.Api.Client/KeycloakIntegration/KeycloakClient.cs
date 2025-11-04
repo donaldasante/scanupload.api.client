@@ -1,32 +1,48 @@
 ﻿using System.Net.Http.Headers;
 using System.Text.Json;
-using System.Text.Json.Serialization;
+using Microsoft.Extensions.Options;
 
 namespace ScanUpload.Api.Client.KeycloakIntegration
 {
     public sealed class KeycloakClient : IDisposable
     {
-        private readonly HttpClient _httpClient;
+        private readonly HttpClient? _httpClient;
         private readonly KeycloakOptions _options;
+        private readonly bool _ownsHttpClient;
         private bool _disposed = false;
 
-        public KeycloakClient(KeycloakOptions options)
+        public KeycloakClient(IOptions<KeycloakOptions> options, HttpClient? httpClient = null)
         {
-            _options = options ?? throw new ArgumentNullException(nameof(options));
-            _httpClient = new HttpClient { Timeout = _options.Timeout };
+            _options = options.Value ?? throw new ArgumentNullException(nameof(options));
+            _httpClient = httpClient;
+            ValidateConfiguration(_options);
+
+            if (httpClient is null)
+            {
+                _httpClient = new HttpClient { Timeout = _options.Timeout };
+                _ownsHttpClient = true;
+            }
+            else
+            {
+                _httpClient = httpClient;
+                _ownsHttpClient = false;
+            }
+
+            if (!_options.ServerUrl.EndsWith("/", StringComparison.Ordinal))
+                _options.ServerUrl += "/";
         }
 
         public KeycloakClient(HttpClient httpClient, KeycloakOptions options)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _options = options ?? throw new ArgumentNullException(nameof(options));
+            ValidateConfiguration(_options);
         }
 
         public async Task<TokenResponse> GetClientCredentialsTokenAsync(
             CancellationToken cancellationToken = default
         )
         {
-            ValidateConfiguration();
             var formData = new List<KeyValuePair<string, string>>
             {
                 new("grant_type", "client_credentials"),
@@ -50,7 +66,7 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
 
             try
             {
-                using var response = await _httpClient
+                using var response = await _httpClient!
                     .SendAsync(request, cancellationToken)
                     .ConfigureAwait(false);
                 var responseContent = await response
@@ -117,8 +133,6 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
             CancellationToken cancellationToken = default
         )
         {
-            ValidateConfiguration();
-
             var formData = new List<KeyValuePair<string, string>>
             {
                 new("grant_type", "refresh_token"),
@@ -133,7 +147,7 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
                 Content = content,
             };
 
-            using var response = await _httpClient
+            using var response = await _httpClient!
                 .SendAsync(request, cancellationToken)
                 .ConfigureAwait(false);
             var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -163,18 +177,18 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
             return tokenResponse;
         }
 
-        private void ValidateConfiguration()
+        private void ValidateConfiguration(KeycloakOptions options)
         {
-            if (string.IsNullOrEmpty(_options.ServerUrl))
+            if (string.IsNullOrEmpty(options.ServerUrl))
                 throw new InvalidOperationException("Keycloak ServerUrl is required");
 
-            if (string.IsNullOrEmpty(_options.Realm))
+            if (string.IsNullOrEmpty(options.Realm))
                 throw new InvalidOperationException("Keycloak Realm is required");
 
-            if (string.IsNullOrEmpty(_options.ClientId))
+            if (string.IsNullOrEmpty(options.ClientId))
                 throw new InvalidOperationException("Keycloak ClientId is required");
 
-            if (string.IsNullOrEmpty(_options.ClientSecret))
+            if (string.IsNullOrEmpty(options.ClientSecret))
                 throw new InvalidOperationException("Keycloak ClientSecret is required");
         }
 
@@ -182,7 +196,8 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
         {
             if (!_disposed)
             {
-                _httpClient?.Dispose();
+                if (_ownsHttpClient)
+                    _httpClient!.Dispose();
                 _disposed = true;
             }
         }

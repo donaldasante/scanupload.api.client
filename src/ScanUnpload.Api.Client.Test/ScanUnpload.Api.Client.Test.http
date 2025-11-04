@@ -1,0 +1,8 @@
+@ScanUnpload.Api.Client.Test_HostAddress = http://localhost:5085
+
+GET {{ScanUnpload.Api.Client.Test_HostAddress}}/token/
+Accept: application/json
+###
+
+GET {{ScanUnpload.Api.Client.Test_HostAddress}}/cached-token/
+Accept: application/json
