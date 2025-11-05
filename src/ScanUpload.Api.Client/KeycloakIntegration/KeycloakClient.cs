@@ -128,55 +128,6 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
             }
         }
 
-        public async Task<TokenResponse> RefreshTokenAsync(
-            string refreshToken,
-            CancellationToken cancellationToken = default
-        )
-        {
-            var formData = new List<KeyValuePair<string, string>>
-            {
-                new("grant_type", "refresh_token"),
-                new("client_id", _options.ClientId),
-                new("client_secret", _options.ClientSecret),
-                new("refresh_token", refreshToken),
-            };
-
-            using var content = new FormUrlEncodedContent(formData);
-            using var request = new HttpRequestMessage(HttpMethod.Post, _options.TokenEndpoint)
-            {
-                Content = content,
-            };
-
-            using var response = await _httpClient!
-                .SendAsync(request, cancellationToken)
-                .ConfigureAwait(false);
-            var responseContent = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                throw new KeycloakException(
-                    "keycloak_request_failed",
-                    $"Keycloak request failed with status {response.StatusCode}: {responseContent}",
-                    (int)response.StatusCode
-                );
-            }
-
-            var tokenResponse = JsonSerializer.Deserialize<TokenResponse>(
-                responseContent,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true }
-            );
-
-            if (tokenResponse == null || !tokenResponse.IsSuccess)
-            {
-                throw new KeycloakException(
-                    tokenResponse?.Error ?? "unknown_error",
-                    tokenResponse?.ErrorDescription ?? "Token refresh failed"
-                );
-            }
-
-            return tokenResponse;
-        }
-
         private void ValidateConfiguration(KeycloakOptions options)
         {
             if (string.IsNullOrEmpty(options.ServerUrl))
