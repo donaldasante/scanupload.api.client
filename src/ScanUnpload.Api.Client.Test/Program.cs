@@ -1,6 +1,7 @@
 using ScanUpload.Api.Client.Extensions;
 using ScanUpload.Api.Client.Interface;
 using ScanUpload.Api.Client.KeycloakIntegration;
+using ScanUpload.Api.Client.Proxy;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,17 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
-// Add Keycloak client
-builder.Services.AddKeycloakClient(options =>
-{
-    options.ServerUrl = builder.Configuration["Keycloak:ServerUrl"] ?? "";
-    options.Realm = builder.Configuration["Keycloak:Realm"] ?? "";
-    options.ClientId = builder.Configuration["Keycloak:ClientId"] ?? "";
-    options.ClientSecret = builder.Configuration["Keycloak:ClientSecret"] ?? "";
-    options.Scope = builder.Configuration["Keycloak:Scope"] ?? "";
-});
+// Use scanupload proxy
+builder.Services.Configure<ScanUploadProxyOptions>(
+    builder.Configuration.GetSection("ScanUploadProxy")
+);
+builder.Services.AddScanUploadProxy(builder.Configuration.GetSection("ScanUploadProxy").Bind);
 
 var app = builder.Build();
+
+app.UseScanUploadProxy();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

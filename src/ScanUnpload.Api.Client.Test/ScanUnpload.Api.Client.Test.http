@@ -6,3 +6,7 @@ Accept: application/json
 
 GET {{ScanUnpload.Api.Client.Test_HostAddress}}/cached-token/
 Accept: application/json
+
+###
+POST {{ScanUnpload.Api.Client.Test_HostAddress}}/scanupload-api/post
+Accept:application/json
