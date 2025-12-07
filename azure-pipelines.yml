@@ -15,7 +15,6 @@ variables:
   project: '$(Build.SourcesDirectory)/src/ScanUpload.Api.Client/ScanUpload.Api.Client.csproj'
   buildPlatform: 'Any CPU'
   buildConfiguration: 'Release'
-  nugetSource: 'https://api.nuget.org/v3/index.json'
 
 steps:
 - task: UseDotNet@2
@@ -65,5 +64,5 @@ steps:
       --source $nugetSource
   env:
     NUGET_API_KEY: $(NUGET_API_KEY)
-    nugetSource: $(nugetSource)
+    nugetSource: https://api.nuget.org/v3/index.json
   displayName: 'Push package to NuGet.org'
