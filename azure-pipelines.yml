@@ -59,11 +59,10 @@ steps:
     ArtifactName: 'nuget-packages'
     publishLocation: 'Container'
 
-- task: DotNetCoreCLI@2
+- script: |
+    dotnet nuget push **/*.nupkg \
+      --api-key $NUGET_API_KEY \
+      --source https://api.nuget.org/v3/index.json
+  env:
+    NUGET_API_KEY: $(NUGET_API_KEY)
   displayName: 'Push package to NuGet.org'
-  inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
-    nuGetFeedType: 'external'
-    publishFeedUrl: 'https://api.nuget.org/v3/index.json'
-    externalFeedCredentials: '$(NUGET_API_KEY)'
