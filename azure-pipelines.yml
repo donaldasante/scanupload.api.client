@@ -39,7 +39,9 @@ steps:
 
 # Extract version from the tag name (strip "release." prefix)
 - script: |
-    echo "##vso[task.setvariable variable=PackageVersion]$(Build.SourceBranchName | sed 's/release.//')"
+    TAG_NAME=$BUILD_SOURCEBRANCHNAME
+    VERSION=${TAG_NAME#release.}
+    echo "##vso[task.setvariable variable=PackageVersion]$VERSION"
   displayName: 'Extract version from tag'
  
 - task: DotNetCoreCLI@2
