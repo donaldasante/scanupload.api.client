@@ -60,7 +60,7 @@ steps:
     publishLocation: 'Container'
 
 - script: |
-    dotnet nuget push **/*.nupkg \
+    dotnet nuget push $(Build.ArtifactStagingDirectory)/*.nupkg \
       --api-key $NUGET_API_KEY \
       --source https://api.nuget.org/v3/index.json
   env:
