@@ -8,5 +8,5 @@ GET {{ScanUnpload.Api.Client.Test_HostAddress}}/cached-token/
 Accept: application/json
 
 ###
-POST {{ScanUnpload.Api.Client.Test_HostAddress}}/scanupload-api/post
+POST {{ScanUnpload.Api.Client.Test_HostAddress}}/scanupload-api/session/create
 Accept:application/json

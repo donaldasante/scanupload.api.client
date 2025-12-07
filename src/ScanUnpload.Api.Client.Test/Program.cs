@@ -58,5 +58,4 @@ app.MapGet(
         }
     }
 );
-
 app.Run();

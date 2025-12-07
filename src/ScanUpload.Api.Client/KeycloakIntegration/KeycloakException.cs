@@ -1,6 +1,6 @@
 ﻿namespace ScanUpload.Api.Client.KeycloakIntegration
 {
-    public class KeycloakException : Exception
+    public sealed class KeycloakException : Exception
     {
         public string? ErrorCode { get; }
         public int? StatusCode { get; }
