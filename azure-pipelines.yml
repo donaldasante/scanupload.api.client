@@ -65,4 +65,5 @@ steps:
     command: 'push'
     packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
     nuGetFeedType: 'external'
-    publishFeedCredentials: 'scanupload.api.client.nuget.feed'    
+    publishFeedUrl: 'https://api.nuget.org/v3/index.json'
+    externalFeedCredentials: '$(NUGET_API_KEY)'
