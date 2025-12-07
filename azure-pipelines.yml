@@ -12,9 +12,7 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  project: '$(Build.SourcesDirectory)/src/ScanUpload.Api.Client/ScanUpload.Api.Client.csproj'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+- group: scanupload-api-client-variables
 
 steps:
 - task: UseDotNet@2
