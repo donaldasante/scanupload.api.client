@@ -1,0 +1,66 @@
+# ASP.NET Core (.NET Framework)
+# Build and test ASP.NET Core projects targeting the full .NET Framework.
+# Add steps that publish symbols, save build artifacts, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core
+
+trigger:
+  tags:
+    include:
+    - release.*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  project: '$(Build.SourcesDirectory)/src/ScanUpload.Api.Client/ScanUpload.Api.Client.csproj'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  nugetSource: 'https://api.nuget.org/v3/index.json'
+
+steps:
+- task: UseDotNet@2
+  displayName: 'Install .NET SDK'
+  inputs:
+    packageType: 'sdk'
+    version: '9.x'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Restore packages'
+  inputs:
+    command: 'restore'
+    projects: '$(project)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build project'
+  inputs:
+    command: 'build'
+    projects: '$(project)'
+    arguments: '--configuration $(buildConfiguration)'
+
+# Extract version from the tag name (strip "release." prefix)
+- script: |
+    echo "##vso[task.setvariable variable=PackageVersion]$(Build.SourceBranchName | sed 's/release.//')"
+  displayName: 'Extract version from tag'
+ 
+- task: DotNetCoreCLI@2
+  displayName: 'Pack NuGet package'
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(project)'
+    versioningScheme: 'off'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory) /p:PackageVersion=$(PackageVersion)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish NuGet package artifact'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'nuget-packages'
+    publishLocation: 'Container'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Push package to NuGet.org'
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
+    nuGetFeedType: 'external'
+    publishFeedCredentials: 'scanupload.api.client.nuget.feed'    
