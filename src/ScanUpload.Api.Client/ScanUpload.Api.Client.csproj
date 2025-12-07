@@ -4,7 +4,7 @@
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Title>ScanUpload Api Client</Title>
     <Description>ScanUpload library to allow seamless integration into ScanUpload SAAS product</Description>
     <PackageId>scanupload.api.client</PackageId>

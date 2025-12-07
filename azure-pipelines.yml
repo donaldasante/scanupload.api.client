@@ -35,7 +35,7 @@ steps:
   inputs:
     command: 'build'
     projects: '$(project)'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) /p:GeneratePackageOnBuild=false'
 
 # Extract version from the tag name (strip "release." prefix)
 - script: |
