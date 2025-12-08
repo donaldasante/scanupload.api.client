@@ -64,4 +64,4 @@ steps:
     arguments: >
       push $(Build.ArtifactStagingDirectory)/*.nupkg
       -s https://api.nuget.org/v3/index.json
-      -k $(NUGET_API_KEY)  
+      -k $(NUGET_API_KEY)
