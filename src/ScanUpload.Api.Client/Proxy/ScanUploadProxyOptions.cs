@@ -5,7 +5,7 @@
         public string ScanUploadTargetBaseUrl { get; set; } = string.Empty;
         public string ScanUploadRoutePrefix { get; set; } = string.Empty;
         public bool ScanUploadStripRoutePrefix { get; set; }
-        public TimeSpan ScanUploadRequestTimeout { get; set; } = TimeSpan.FromSeconds(30);
+        public TimeSpan ScanUploadRequestTimeout { get; set; } = TimeSpan.FromMinutes(1);
 
         // Headers to forward from client request to target
         public string[] ScanUploadHeadersToForward { get; set; } = [];
@@ -18,7 +18,7 @@
         public string KeycloakClientSecret { get; set; } = string.Empty;
         public string? KeycloakScope { get; set; }
         public TimeSpan KeycloakTimeout { get; set; } = TimeSpan.FromSeconds(30);
-        public int KeycloakEarlyRefreshSeconds { get; set; } = 30;
+        public int KeycloakEarlyRefreshSeconds { get; set; } = 120;
 
         public string KeycloakTokenEndpoint =>
             $"{KeycloakServerUrl.TrimEnd('/')}/realms/{KeycloakRealm}/protocol/openid-connect/token";

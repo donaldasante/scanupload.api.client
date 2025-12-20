@@ -28,7 +28,7 @@ namespace ScanUpload.Api.Client.Extensions
                         client.Timeout = options.ScanUploadRequestTimeout;
                     }
                 )
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10));
             services.AddKeycloakClient();
             return services;
         }

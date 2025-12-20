@@ -1,4 +1,5 @@
 ﻿using System.IO.Pipelines;
+using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using ScanUpload.Api.Client.Interface;
@@ -25,13 +26,36 @@ namespace ScanUpload.Api.Client.Proxy
             _tokenProvider = tokenProvider;
         }
 
-        public Task<bool> ShouldProxyAsync(HttpContext context)
+        public Task<bool> ShouldProxyToApiAsync(HttpContext context)
         {
             var path = context.Request.Path.ToString();
             return Task.FromResult(path.StartsWith(_options.ScanUploadRoutePrefix));
         }
 
-        public async Task ProxyRequestAsync(HttpContext context)
+        public Task<bool> ShouldProxyToTokenApiAsync(HttpContext context)
+        {
+            var path = context.Request.Path.ToString();
+            return Task.FromResult(
+                path.StartsWith(_options.ScanUploadRoutePrefix) && path.Contains("/token")
+            );
+        }
+
+        public async Task ProxyRequestToTokenApiAsync(HttpContext context)
+        {
+            // For token requests, we can directly get the token and return it
+            var tokenResponse = await _tokenProvider.GetAccessTokenAsync();
+            context.Response.ContentType = "application/json";
+
+            var payload = new
+            {
+                access_token = tokenResponse.AccessToken,
+                expires_in = tokenResponse.ExpiresIn,
+            };
+
+            await context.Response.WriteAsync(JsonSerializer.Serialize(payload));
+        }
+
+        public async Task ProxyRequestToApiAsync(HttpContext context)
         {
             try
             {

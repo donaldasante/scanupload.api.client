@@ -25,7 +25,7 @@ namespace ScanUpload.Api.Client.Extensions
                         client.Timeout = options.KeycloakTimeout;
                     }
                 )
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10));
 
             services.TryAddSingleton<KeycloakClient>();
             services.TryAddSingleton<ITokenProvider, TokenProvider>();
@@ -45,7 +45,7 @@ namespace ScanUpload.Api.Client.Extensions
                         client.Timeout = options.KeycloakTimeout;
                     }
                 )
-                .SetHandlerLifetime(TimeSpan.FromMinutes(5));
+                .SetHandlerLifetime(TimeSpan.FromMinutes(10));
 
             services.TryAddSingleton<KeycloakClient>();
             services.TryAddSingleton<ITokenProvider, TokenProvider>();
