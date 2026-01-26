@@ -1,4 +1,5 @@
-@ScanUnpload.Api.Client.Test_HostAddress = https://localhost:7185
+@ScanUnpload.Api.Client.Test_HostAddress = https://localhost:7021
+@sessionId = lSWkJbxoP_Lgxg_NIyLpA18k6gziD5AW6rytIP1Y1qY
 
 GET {{ScanUnpload.Api.Client.Test_HostAddress}}/token/
 Accept: application/json
@@ -19,3 +20,12 @@ Content-Type: application/json
 ###
 GET {{ScanUnpload.Api.Client.Test_HostAddress}}/scanupload-api/token
 Accept:application/json
+
+###
+GET {{ScanUnpload.Api.Client.Test_HostAddress}}/scanupload-api/file-management/download-session/{{sessionId}}
+Accept:application/json
+
+###
+GET {{ScanUnpload.Api.Client.Test_HostAddress}}/download-file/{{sessionId}}
+Accept:application/json
+
