@@ -80,10 +80,14 @@ app.MapGet(
         try
         {
             await foreach (var (fileName, stream) in scanUploadApiClient.DownloadAsync(sessionId, cancellationToken)) 
-            { 
-                Console.WriteLine($"Received file: {fileName}"); 
-                using var file = File.Create(Path.Combine("output", fileName)); 
+            {
+                Console.WriteLine($"Received file: {fileName}");
+                var outputDir = Path.Combine(Environment.CurrentDirectory, "output");
+                Directory.CreateDirectory(outputDir);
+
+                using var file = File.Create(Path.Combine(outputDir, fileName));
                 await stream.CopyToAsync(file, cancellationToken);
+
                 return Results.Ok(file);
             }
 
