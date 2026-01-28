@@ -1,5 +1,5 @@
 @ScanUnpload.Api.Client.Test_HostAddress = https://localhost:7021
-@sessionId = lSWkJbxoP_Lgxg_NIyLpA18k6gziD5AW6rytIP1Y1qY
+@sessionId = yqNa8Y6m4V3gobTSYk_543BT-lNF69-gd_W0J4wLnws
 
 GET {{ScanUnpload.Api.Client.Test_HostAddress}}/token/
 Accept: application/json

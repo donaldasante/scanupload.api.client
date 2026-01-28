@@ -1,4 +1,3 @@
-using ScanUpload.Api.Client.ApiClient;
 using ScanUpload.Api.Client.Extensions;
 using ScanUpload.Api.Client.Interface;
 using ScanUpload.Api.Client.KeycloakIntegration;
@@ -17,16 +16,7 @@ builder.Services.Configure<ScanUploadProxyOptions>(
 );
 builder.Services.AddScanUploadProxy(builder.Configuration.GetSection("ScanUploadProxy").Bind);
 builder.Services.AddTransient<AuthenticatedHttpClientHandler>();
-builder
-  .Services.AddHttpClient<IScanUploadApiClient, ScanUploadApiClient>(client =>
-  {
-      var apiUrl = builder.Configuration["ScanUploadProxy:ScanUploadApiClient:ScanUploadBaseUrl"]
-        ?? throw new FileNotFoundException("ScanUpload download URL not found");
-      client.BaseAddress = new Uri(apiUrl);
-      client.DefaultRequestHeaders.Add("Accept", "application/json");
-      client.Timeout = TimeSpan.FromSeconds(120);
-  })
-  .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+builder.Services.AddScanUploadApiClient(builder.Configuration);
 
 var app = builder.Build();
 
@@ -86,8 +76,6 @@ app.MapGet(
 
                 using var file = File.Create(Path.Combine(outputDir, fileName));
                 await stream.CopyToAsync(file, cancellationToken);
-
-                return Results.Ok(file);
             }
 
             return Results.Ok();

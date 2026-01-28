@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using ScanUpload.Api.Client.ApiClient;
 using ScanUpload.Api.Client.Interface;
 using ScanUpload.Api.Client.Middleware;
 using ScanUpload.Api.Client.Proxy;
@@ -30,6 +32,21 @@ namespace ScanUpload.Api.Client.Extensions
                 )
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10));
             services.AddKeycloakClient();
+            return services;
+        }
+
+        public static IServiceCollection AddScanUploadApiClient(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.AddHttpClient<IScanUploadApiClient, ScanUploadApiClient>(client =>
+              {
+                  var apiUrl = configuration["ScanUploadProxy:ScanUploadApiClient:ScanUploadBaseUrl"]
+                    ?? throw new FileNotFoundException("ScanUpload download URL not found");
+                  client.BaseAddress = new Uri(apiUrl);
+                  client.DefaultRequestHeaders.Add("Accept", "application/json");
+                  client.Timeout = TimeSpan.FromSeconds(120);
+              })
+              .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
             return services;
         }
 
