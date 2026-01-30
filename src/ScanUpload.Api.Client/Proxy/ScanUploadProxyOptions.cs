@@ -17,7 +17,7 @@
         public string KeycloakClientId { get; set; } = string.Empty;
         public string KeycloakClientSecret { get; set; } = string.Empty;
         public string? KeycloakScope { get; set; }
-        public TimeSpan KeycloakTimeout { get; set; } = TimeSpan.FromSeconds(30);
+        public TimeSpan KeycloakTimeout { get; set; } = TimeSpan.FromSeconds(60);
         public int KeycloakEarlyRefreshSeconds { get; set; } = 120;
 
         public string KeycloakTokenEndpoint =>
