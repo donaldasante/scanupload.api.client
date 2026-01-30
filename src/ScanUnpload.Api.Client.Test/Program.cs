@@ -14,9 +14,15 @@ builder.Services.AddOpenApi();
 builder.Services.Configure<ScanUploadProxyOptions>(
     builder.Configuration.GetSection("ScanUploadProxy")
 );
-builder.Services.AddScanUploadProxy(builder.Configuration.GetSection("ScanUploadProxy").Bind);
+builder.Services.AddScanUploadProxy(builder.Configuration.GetSection("ScanUploadProxy").Bind, builder =>
+{
+    builder.AddStandardResilienceHandler();
+});
 builder.Services.AddTransient<AuthenticatedHttpClientHandler>();
-builder.Services.AddScanUploadApiClient(builder.Configuration);
+builder.Services.AddScanUploadApiClient(builder.Configuration, builder =>
+{
+    builder.AddStandardResilienceHandler();
+});
 
 var app = builder.Build();
 

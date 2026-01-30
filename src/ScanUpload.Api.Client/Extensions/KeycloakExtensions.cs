@@ -11,11 +11,12 @@ namespace ScanUpload.Api.Client.Extensions
     {
         internal static IServiceCollection AddKeycloakClient(
             this IServiceCollection services,
-            Action<ScanUploadProxyOptions> configureOptions
+            Action<ScanUploadProxyOptions> configureOptions, 
+            Action<IHttpClientBuilder>? configure = null
         )
         {
             services.Configure(configureOptions);
-            services
+            var builder = services
                 .AddHttpClient<KeycloakClient>(
                     (serviceProvider, client) =>
                     {
@@ -30,12 +31,14 @@ namespace ScanUpload.Api.Client.Extensions
             services.TryAddSingleton<KeycloakClient>();
             services.TryAddSingleton<ITokenProvider, TokenProvider>();
 
+            configure?.Invoke(builder);
             return services;
         }
 
-        internal static IServiceCollection AddKeycloakClient(this IServiceCollection services)
+        internal static IServiceCollection AddKeycloakClient(
+            this IServiceCollection services, Action<IHttpClientBuilder>? configure = null)
         {
-            services
+            var builder = services
                 .AddHttpClient<KeycloakClient>(
                     (serviceProvider, client) =>
                     {
@@ -49,6 +52,8 @@ namespace ScanUpload.Api.Client.Extensions
 
             services.TryAddSingleton<KeycloakClient>();
             services.TryAddSingleton<ITokenProvider, TokenProvider>();
+
+            configure?.Invoke(builder);
 
             return services;
         }

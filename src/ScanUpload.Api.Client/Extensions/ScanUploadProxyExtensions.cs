@@ -6,6 +6,7 @@ using ScanUpload.Api.Client.ApiClient;
 using ScanUpload.Api.Client.Interface;
 using ScanUpload.Api.Client.Middleware;
 using ScanUpload.Api.Client.Proxy;
+using System.Reflection;
 
 namespace ScanUpload.Api.Client.Extensions
 {
@@ -13,14 +14,15 @@ namespace ScanUpload.Api.Client.Extensions
     {
         public static IServiceCollection AddScanUploadProxy(
             this IServiceCollection services,
-            Action<ScanUploadProxyOptions> configureOptions
+            Action<ScanUploadProxyOptions> configureOptions,
+            Action<IHttpClientBuilder>? configure = null
         )
         {
             // Configure options
             services.Configure(configureOptions);
 
             // Register the proxy service
-            services
+            var builder = services
                 .AddHttpClient<IScanUploadProxyService, ScanUploadProxyService>(
                     (serviceProvider, client) =>
                     {
@@ -31,13 +33,19 @@ namespace ScanUpload.Api.Client.Extensions
                     }
                 )
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10));
-            services.AddKeycloakClient();
+            services.AddKeycloakClient(configure);
+
+            configure?.Invoke(builder);
+
             return services;
         }
 
-        public static IServiceCollection AddScanUploadApiClient(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddScanUploadApiClient(
+            this IServiceCollection services, 
+            IConfiguration configuration,
+            Action<IHttpClientBuilder>? configure = null)
         {
-            services.AddHttpClient<IScanUploadApiClient, ScanUploadApiClient>(client =>
+            var builder = services.AddHttpClient<IScanUploadApiClient, ScanUploadApiClient>(client =>
               {
                   var apiUrl = configuration["ScanUploadProxy:ScanUploadApiClient:ScanUploadBaseUrl"]
                     ?? throw new FileNotFoundException("ScanUpload download URL not found");
@@ -46,6 +54,8 @@ namespace ScanUpload.Api.Client.Extensions
                   client.Timeout = TimeSpan.FromSeconds(120);
               })
               .AddHttpMessageHandler<AuthenticatedHttpClientHandler>();
+
+            configure?.Invoke(builder);
 
             return services;
         }
