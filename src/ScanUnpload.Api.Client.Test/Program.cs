@@ -18,7 +18,7 @@ builder.Services.AddScanUploadProxy(builder.Configuration.GetSection("ScanUpload
 {
     builder.AddStandardResilienceHandler();
 });
-builder.Services.AddTransient<AuthenticatedHttpClientHandler>();
+
 builder.Services.AddScanUploadApiClient(builder.Configuration, builder =>
 {
     builder.AddStandardResilienceHandler();

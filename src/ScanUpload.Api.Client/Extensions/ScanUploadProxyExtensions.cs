@@ -6,7 +6,6 @@ using ScanUpload.Api.Client.ApiClient;
 using ScanUpload.Api.Client.Interface;
 using ScanUpload.Api.Client.Middleware;
 using ScanUpload.Api.Client.Proxy;
-using System.Reflection;
 
 namespace ScanUpload.Api.Client.Extensions
 {
@@ -45,6 +44,7 @@ namespace ScanUpload.Api.Client.Extensions
             IConfiguration configuration,
             Action<IHttpClientBuilder>? configure = null)
         {
+            services.AddTransient<AuthenticatedHttpClientHandler>();
             var builder = services.AddHttpClient<IScanUploadApiClient, ScanUploadApiClient>(client =>
               {
                   var apiUrl = configuration["ScanUploadProxy:ScanUploadApiClient:ScanUploadBaseUrl"]
