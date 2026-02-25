@@ -45,7 +45,7 @@ steps:
 
     git push github HEAD:refs/heads/main
     git push github --tags
-    displayName: Mirror repo to ScanUpload.Api.Client GitHub
+  displayName: Mirror repo to ScanUpload.Api.Client GitHub
 
 # Extract version from the tag name (strip "release." prefix)
 - script: |
