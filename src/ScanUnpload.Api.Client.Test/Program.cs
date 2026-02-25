@@ -1,7 +1,6 @@
 using ScanUpload.Api.Client.Extensions;
 using ScanUpload.Api.Client.Interface;
 using ScanUpload.Api.Client.KeycloakIntegration;
-using ScanUpload.Api.Client.Middleware;
 using ScanUpload.Api.Client.Proxy;
 
 var builder = WebApplication.CreateBuilder(args);
