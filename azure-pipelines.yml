@@ -15,6 +15,8 @@ variables:
 - group: scanupload-api-client-variables
 
 steps:
+- checkout: self 
+  fetchDepth: 0
 - task: UseDotNet@2
   displayName: 'Install .NET SDK'
   inputs:
@@ -41,8 +43,8 @@ steps:
 
     git remote add github https://$(GITHUB_PAT)@github.com/donaldasante/scanupload.api.client.git || true
 
-    git push github HEAD:refs/heads/main --force
-    git push github --tags --force
+    git push github HEAD:refs/heads/main
+    git push github --tags
     displayName: Mirror repo to ScanUpload.Api.Client GitHub
 
 # Extract version from the tag name (strip "release." prefix)
