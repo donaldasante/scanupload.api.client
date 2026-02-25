@@ -44,7 +44,7 @@ steps:
     git remote add github https://$(GITHUB_PAT)@github.com/donaldasante/scanupload.api.client.git || true
 
     git push github HEAD:refs/heads/main
-    git push github --tags
+    git push github --tags --force
   displayName: Mirror repo to ScanUpload.Api.Client GitHub
 
 # Extract version from the tag name (strip "release." prefix)
