@@ -34,6 +34,17 @@ steps:
     projects: '$(project)'
     arguments: '--configuration $(buildConfiguration) /p:GeneratePackageOnBuild=false'
 
+- script: |
+    git config --global user.email "azdo_ci@scanupload.net"
+    git config --global user.name "Azure DevOps CI"
+    git config --global http.postBuffer 524288000
+
+    git remote add github https://$(GITHUB_PAT)@github.com/donaldasante/scanupload.api.client.git || true
+
+    git push github HEAD:refs/heads/main --force
+    git push github --tags --force
+    displayName: Mirror repo to ScanUpload.Api.Client GitHub
+
 # Extract version from the tag name (strip "release." prefix)
 - script: |
     TAG_NAME=$BUILD_SOURCEBRANCHNAME

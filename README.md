@@ -1,5 +1,6 @@
 ﻿# ScanUpload.Api.Client – .NET Integration Guide
 
+[ScanUpload](https://qa-app.scanupload.net/) enables the integration and the ability to use QR codes to scan and upload files directly from a mobile device to your webapp.
 This guide explains how to integrate **ScanUpload.Api.Client** into a modern or legacy .NET application. The client library targets **.NET Standard 2.1**, making it compatible with:
 
 -   .NET 6+
