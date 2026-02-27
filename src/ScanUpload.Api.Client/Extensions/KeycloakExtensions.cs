@@ -11,7 +11,7 @@ namespace ScanUpload.Api.Client.Extensions
     {
         internal static IServiceCollection AddKeycloakClient(
             this IServiceCollection services,
-            Action<ScanUploadProxyOptions> configureOptions, 
+            Action<ScanUploadProxyOptions> configureOptions,
             Action<IHttpClientBuilder>? configure = null
         )
         {
@@ -28,7 +28,7 @@ namespace ScanUpload.Api.Client.Extensions
                 )
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10));
 
-            services.TryAddSingleton<KeycloakClient>();
+            services.TryAddSingleton<IKeycloakClient, KeycloakClient>();
             services.TryAddSingleton<ITokenProvider, TokenProvider>();
 
             configure?.Invoke(builder);
@@ -50,7 +50,7 @@ namespace ScanUpload.Api.Client.Extensions
                 )
                 .SetHandlerLifetime(TimeSpan.FromMinutes(10));
 
-            services.TryAddSingleton<KeycloakClient>();
+            services.TryAddSingleton<IKeycloakClient, KeycloakClient>();
             services.TryAddSingleton<ITokenProvider, TokenProvider>();
 
             configure?.Invoke(builder);

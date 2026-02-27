@@ -5,12 +5,12 @@ using ScanUpload.Api.Client.Proxy;
 namespace ScanUpload.Api.Client.KeycloakIntegration
 {
     public sealed class TokenProvider(
-        KeycloakClient keycloakClient,
+        IKeycloakClient keycloakClient,
         IOptions<ScanUploadProxyOptions> options
     ) : ITokenProvider, IDisposable
     {
         private volatile TokenResponse? _cached; // fast read by multiple threads
-        private readonly KeycloakClient _keycloakClient = keycloakClient;
+        private readonly IKeycloakClient _keycloakClient = keycloakClient;
         private readonly SemaphoreSlim _refreshLock = new(1, 1);
         private readonly ScanUploadProxyOptions _options = options.Value;
 

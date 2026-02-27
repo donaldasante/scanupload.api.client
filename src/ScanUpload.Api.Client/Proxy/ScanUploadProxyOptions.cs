@@ -4,6 +4,7 @@
     {
         public string ScanUploadTargetBaseUrl { get; set; } = string.Empty;
         public string ScanUploadRoutePrefix { get; set; } = string.Empty;
+        public string ScanUploadTokenRoute { get; set; } = string.Empty;
         public bool ScanUploadStripRoutePrefix { get; set; }
         public TimeSpan ScanUploadRequestTimeout { get; set; } = TimeSpan.FromMinutes(1);
 

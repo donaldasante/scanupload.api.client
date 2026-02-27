@@ -13,11 +13,11 @@ namespace ScanUpload.Api.Client.Middleware
 
         public async Task InvokeAsync(HttpContext context)
         {
-            if (await _proxyService.ShouldProxyToTokenApiAsync(context))
+            if (_proxyService.ShouldProxyToTokenApi(context))
             {
                 await _proxyService.ProxyRequestToTokenApiAsync(context);
             }
-            else if (await _proxyService.ShouldProxyToApiAsync(context))
+            else if (_proxyService.ShouldProxyToApi(context))
             {
                 await _proxyService.ProxyRequestToApiAsync(context);
             }

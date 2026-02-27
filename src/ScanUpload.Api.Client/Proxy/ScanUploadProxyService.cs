@@ -1,43 +1,61 @@
-﻿using System.IO.Pipelines;
-using System.Text.Json;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using ScanUpload.Api.Client.Interface;
+using System.Text.Json;
 
 namespace ScanUpload.Api.Client.Proxy
 {
     public sealed class ScanUploadProxyService : IScanUploadProxyService
     {
+        private static readonly HashSet<string> _restrictedHeaders = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            "Host",
+            "Connection",
+            "Upgrade",
+            "Keep-Alive",
+            "Proxy-Connection",
+            "Transfer-Encoding",
+            "Content-Length",
+        };
+
         private readonly HttpClient _httpClient;
         private readonly ScanUploadProxyOptions _options;
         private readonly ITokenProvider _tokenProvider;
+        private readonly ILogger<ScanUploadProxyService> _logger;
 
         public ScanUploadProxyService(
             HttpClient httpClient,
             IOptions<ScanUploadProxyOptions> options,
-            ITokenProvider tokenProvider
+            ITokenProvider tokenProvider,
+            ILogger<ScanUploadProxyService> logger
         )
         {
             _httpClient = httpClient;
             _options = options.Value;
-
-            // Configure HttpClient
-            _httpClient.Timeout = _options.ScanUploadRequestTimeout;
             _tokenProvider = tokenProvider;
+            _logger = logger;
         }
 
-        public Task<bool> ShouldProxyToApiAsync(HttpContext context)
+        public bool ShouldProxyToApi(HttpContext context)
         {
-            var path = context.Request.Path.ToString();
-            return Task.FromResult(path.StartsWith(_options.ScanUploadRoutePrefix));
+            return
+                context.Request.Path.StartsWithSegments(
+                    new PathString(_options.ScanUploadRoutePrefix),
+                    StringComparison.OrdinalIgnoreCase
+                );
         }
 
-        public Task<bool> ShouldProxyToTokenApiAsync(HttpContext context)
+        public bool ShouldProxyToTokenApi(HttpContext context)
         {
-            var path = context.Request.Path.ToString();
-            return Task.FromResult(
-                path.StartsWith(_options.ScanUploadRoutePrefix) && path.Contains("/token")
-            );
+            if (string.IsNullOrEmpty(_options.ScanUploadTokenRoute))
+                return false;
+
+            return string.Equals(
+                    context.Request.Path.Value,
+                    _options.ScanUploadTokenRoute,
+                    StringComparison.OrdinalIgnoreCase
+                );
         }
 
         public async Task ProxyRequestToTokenApiAsync(HttpContext context)
@@ -93,8 +111,9 @@ namespace ScanUpload.Api.Client.Proxy
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Proxy request failed for {Method} {Path}", context.Request.Method, context.Request.Path);
                 context.Response.StatusCode = 500;
-                await context.Response.WriteAsync($"Proxy error: {ex.Message}");
+                await context.Response.WriteAsync("An error occurred while processing the request.");
             }
         }
 
@@ -216,20 +235,7 @@ namespace ScanUpload.Api.Client.Proxy
             await responseStream.CopyToAsync(context.Response.Body);
         }
 
-        private bool IsRestrictedHeader(string headerName)
-        {
-            var restrictedHeaders = new[]
-            {
-                "Host",
-                "Connection",
-                "Upgrade",
-                "Keep-Alive",
-                "Proxy-Connection",
-                "Transfer-Encoding",
-                "Content-Length",
-            };
-
-            return restrictedHeaders.Contains(headerName, StringComparer.OrdinalIgnoreCase);
-        }
+        private static bool IsRestrictedHeader(string headerName) =>
+            _restrictedHeaders.Contains(headerName);
     }
 }

@@ -40,7 +40,7 @@ namespace ScanUpload.Api.Client.Extensions
         }
 
         public static IServiceCollection AddScanUploadApiClient(
-            this IServiceCollection services, 
+            this IServiceCollection services,
             IConfiguration configuration,
             Action<IHttpClientBuilder>? configure = null)
         {
@@ -48,7 +48,7 @@ namespace ScanUpload.Api.Client.Extensions
             var builder = services.AddHttpClient<IScanUploadApiClient, ScanUploadApiClient>(client =>
               {
                   var apiUrl = configuration["ScanUploadProxy:ScanUploadApiClient:ScanUploadBaseUrl"]
-                    ?? throw new FileNotFoundException("ScanUpload download URL not found");
+                    ?? throw new InvalidOperationException("ScanUpload download URL not found");
                   client.BaseAddress = new Uri(apiUrl);
                   client.DefaultRequestHeaders.Add("Accept", "application/json");
                   client.Timeout = TimeSpan.FromSeconds(120);

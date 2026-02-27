@@ -2,6 +2,6 @@
 {
     public interface IScanUploadApiClient
     {
-        IAsyncEnumerable<(string FileName, Stream Content)> DownloadAsync(string sessionId, CancellationToken cancellationToken = default);
+        Task DownloadAsync(string sessionId, Func<string, Stream, CancellationToken, Task> processEntry, CancellationToken cancellationToken = default);
     }
 }

@@ -1,11 +1,12 @@
-﻿using System.Net.Http.Headers;
-using System.Text.Json;
-using Microsoft.Extensions.Options;
+﻿using Microsoft.Extensions.Options;
+using ScanUpload.Api.Client.Interface;
 using ScanUpload.Api.Client.Proxy;
+using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace ScanUpload.Api.Client.KeycloakIntegration
 {
-    public sealed class KeycloakClient : IDisposable
+    public sealed class KeycloakClient : IKeycloakClient, IDisposable
     {
         private readonly HttpClient? _httpClient;
         private readonly ScanUploadProxyOptions _options;
@@ -31,9 +32,6 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
                 _httpClient = httpClient;
                 _ownsHttpClient = false;
             }
-
-            if (!_options.KeycloakServerUrl.EndsWith("/", StringComparison.Ordinal))
-                _options.KeycloakServerUrl += "/";
         }
 
         public async Task<TokenResponse> GetClientCredentialsTokenAsync(
@@ -128,7 +126,7 @@ namespace ScanUpload.Api.Client.KeycloakIntegration
             }
         }
 
-        private void ValidateConfiguration(ScanUploadProxyOptions options)
+        private static void ValidateConfiguration(ScanUploadProxyOptions options)
         {
             if (string.IsNullOrEmpty(options.KeycloakServerUrl))
                 throw new InvalidOperationException("Keycloak ServerUrl is required");
