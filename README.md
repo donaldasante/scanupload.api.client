@@ -135,6 +135,10 @@ app.UseScanUploadProxy();
 
 ## Minimal `Program.cs` example
 ```csharp
+using ScanUpload.Api.Client.Extensions;
+using ScanUpload.Api.Client.Interface;
+using ScanUpload.Api.Client.KeycloakIntegration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.Configure<ScanUploadProxyOptions>(
