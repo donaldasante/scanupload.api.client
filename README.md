@@ -11,6 +11,10 @@ This guide explains how to integrate **ScanUpload.Api.Client** into a modern or 
 -   ASP.NET Core applications 
 -   Older supported .NET runtimes that support .NET Standard 2.1
 
+## Front-end integrations
+This official client library is designed to work seamlessly with certain ScanUpload front-end components, such as:
+-   [ScanUpload.QrCodeGenerator.React](https://github.com/donaldasante/scanupload.qrcodegenerator.react) – ScanUpload Qr code generator for React applications
+
 ## Prerequisites
 
 -   [.NET SDK](https://dotnet.microsoft.com/en-us/download)
@@ -31,7 +35,7 @@ This works for:
 ## Install the ScanUpload API client
 
 ```sh
-dotnet add package ScanUpload.Api.Client --version 0.1.0-alpha.7
+dotnet add package ScanUpload.Api.Client --version 0.1.0-alpha.10
 dotnet add package Microsoft.Extensions.Http.Resilience
 ```
 
@@ -50,6 +54,7 @@ Add the ScanUpload configuration section to `appsettings.json`:
   "ScanUploadProxy": {
     "ScanUploadTargetBaseUrl": "https://qa-hub.scanupload.net/api/front-end",
     "ScanUploadRoutePrefix": "/scanupload-api",
+    "ScanUploadTokenRoute": "/scanupload-api/token",
     "ScanUploadStripRoutePrefix": true,
     "ScanUploadRequestTimeout": "00:01:30",
     "ScanUploadHeadersToForward": [
