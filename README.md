@@ -1,6 +1,6 @@
 ﻿# ScanUpload.Api.Client – .NET Integration Guide
 
-[ScanUpload](https://qa-app.scanupload.net/) enables the integration and the ability to use QR codes to scan and upload files directly from a mobile device to your webapp.
+[ScanUpload](https://app.scanupload.net/) enables the integration and the ability to use QR codes to scan and upload files directly from a mobile device to your webapp.
 This guide explains how to integrate **ScanUpload.Api.Client** into a modern or legacy .NET application. The client library targets **.NET Standard 2.1**, making it compatible with:
 
 -   .NET 6+
@@ -18,7 +18,7 @@ This official client library is designed to work seamlessly with certain ScanUpl
 ## Prerequisites
 
 -   [.NET SDK](https://dotnet.microsoft.com/en-us/download)
--   [A ScanUpload account](https://qa-app.scanupload.net/)
+-   [A ScanUpload account](https://app.scanupload.net/)
 -   A ScanUpload **Client ID** and **Client Secret**
 
 ```sh
@@ -35,7 +35,7 @@ This works for:
 ## Install the ScanUpload API client
 
 ```sh
-dotnet add package ScanUpload.Api.Client --version 0.1.0-alpha.10
+dotnet add package ScanUpload.Api.Client --version 1.0.0
 dotnet add package Microsoft.Extensions.Http.Resilience
 ```
 
@@ -52,7 +52,7 @@ Add the ScanUpload configuration section to `appsettings.json`:
 
 ```json
   "ScanUploadProxy": {
-    "ScanUploadTargetBaseUrl": "https://qa-hub.scanupload.net/api/front-end",
+    "ScanUploadTargetBaseUrl": "https://hub.scanupload.net/api/front-end",
     "ScanUploadRoutePrefix": "/scanupload-api",
     "ScanUploadTokenRoute": "/scanupload-api/token",
     "ScanUploadStripRoutePrefix": true,
@@ -65,14 +65,14 @@ Add the ScanUpload configuration section to `appsettings.json`:
       "X-API-Key"
     ],
     "ScanUploadApiClient": {
-      "ScanUploadBaseUrl": "https://qa-hub.scanupload.net"
+      "ScanUploadBaseUrl": "https://hub.scanupload.net"
     },
     "ScanUploadAdditionalHeaders": {
       "X-Forwarded-By": "ScanUpload-Proxy",
       "X-Proxy-Version": "1.0"
     },
     "KeycloakServerUrl": "https://identity.scanupload.net/",
-    "KeycloakRealm": "qa-scanupload-hub",
+    "KeycloakRealm": "scanupload-hub",
     "KeycloakScope": "openid profile email scanupload.hub"
   }
 ```
