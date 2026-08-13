@@ -1,197 +1,65 @@
-﻿# ScanUpload.Api.Client – .NET Integration Guide
+# ScanUpload.Api.Client
 
-[ScanUpload](https://app.scanupload.net/) enables the integration and the ability to use QR codes to scan and upload files directly from a mobile device to your webapp.
-This guide explains how to integrate **ScanUpload.Api.Client** into a modern or legacy .NET application. The client library targets **.NET Standard 2.1**, making it compatible with:
+ScanUpload.Api.Client enables .NET backend applications to download files uploaded through a ScanUpload session.
 
--   .NET 6+
--   .NET 7
--   .NET 8
--   .NET 9 
--   .NET 10 (preview)
--   ASP.NET Core applications 
--   Older supported .NET runtimes that support .NET Standard 2.1
+## Backend downloads
 
-## Front-end integrations
-This official client library is designed to work seamlessly with certain ScanUpload front-end components, such as:
--   [ScanUpload.QrCodeGenerator.React](https://github.com/donaldasante/scanupload.qrcodegenerator.react) – ScanUpload Qr code generator for React applications
+Use this package from an ASP.NET Core application, worker service, console application, or other trusted backend. It obtains an access token and downloads a session file bundle so that your backend can store or process the files.
 
-## Prerequisites
+Do not use this package in a browser, mobile application, or other public client. Downloads must occur on the backend.
 
--   [.NET SDK](https://dotnet.microsoft.com/en-us/download)
--   [A ScanUpload account](https://app.scanupload.net/)
--   A ScanUpload **Client ID** and **Client Secret**
+## Client secret required
 
-```sh
-dotnet new webapi -n ScanUploadExample
-cd  ScanUploadExample
-```
+The API client uses OAuth 2.0 client-credentials authentication. A ScanUpload OAuth client ID and client secret are required to obtain the bearer token used for downloads.
 
-This works for:
+Keep the client secret private. Use user secrets for local development and an environment variable or managed secret store in production. Never commit the secret to source control or expose it to users.
 
--   .NET 6+
--   .NET 9 / 10 previews
--   Existing ASP.NET Core projects
+## Requirements
 
-## Install the ScanUpload API client
+- .NET 8, .NET 9, or .NET 10
+- A ScanUpload account
+- A ScanUpload OAuth client ID and client secret
+
+## Install
 
 ```sh
-dotnet add package ScanUpload.Api.Client --version 1.0.0
-dotnet add package Microsoft.Extensions.Http.Resilience
+dotnet add package ScanUpload.Api.Client
 ```
 
-### Using Visual Studio
+## Download example
 
-1.  Right‑click the project → **Manage NuGet Packages** 
-2.  Enable **Include prerelease**   
-3.  Search for **ScanUpload.Api.Client**  
-4.  Install the latest  version   
-5.  Install **Microsoft.Extensions.Http.Resilience** (optional)
+Register the API client with the application's configuration:
 
-## Configuration
-Add the ScanUpload configuration section to `appsettings.json`:
-
-```json
-  "ScanUploadProxy": {
-    "ScanUploadTargetBaseUrl": "https://hub.scanupload.net/api/front-end",
-    "ScanUploadRoutePrefix": "/scanupload-api",
-    "ScanUploadTokenRoute": "/scanupload-api/token",
-    "ScanUploadStripRoutePrefix": true,
-    "ScanUploadRequestTimeout": "00:01:30",
-    "ScanUploadHeadersToForward": [
-      "Authorization",
-      "Content-Type",
-      "User-Agent",
-      "X-Requested-With",
-      "X-API-Key"
-    ],
-    "ScanUploadApiClient": {
-      "ScanUploadBaseUrl": "https://hub.scanupload.net"
-    },
-    "ScanUploadAdditionalHeaders": {
-      "X-Forwarded-By": "ScanUpload-Proxy",
-      "X-Proxy-Version": "1.0"
-    },
-    "KeycloakServerUrl": "https://identity.scanupload.net/",
-    "KeycloakRealm": "scanupload-hub",
-    "KeycloakScope": "openid profile email scanupload.hub"
-  }
-```
-
-🔐 For local development, store secrets using **User Secrets** instead of committing them to source control.
-
-### Configure user secrets
-Please use ASP.NET Core user secrets for local development. These values are **not** committed to source control.
-
-```sh
-dotnet user-secrets init
-```
-Add your ScanUpload credentials:
-
-```sh
-dotnet user-secrets set "ScanUploadProxy:KeycloakClientId"  "your-client-id"  
-dotnet user-secrets set "ScanUploadProxy:KeycloakClientSecret"  "your-client-secret"
-```
-This creates a `secrets.json` file in your local user profile, for example:
-
-```json
-{
-  "ScanUploadProxy": {
-    "KeycloakClientId": "your-client-id",
-    "KeycloakClientSecret": "your-client-secret"
-  }
-}
-```
-# Configure services in `Program.cs`
-
-## Register ScanUpload services
-
-```csharp
-builder.Services.Configure<ScanUploadProxyOptions>(
-    builder.Configuration.GetSection("ScanUploadProxy")
-);
-
-builder.Services.AddScanUploadProxy(
-    builder.Configuration.GetSection("ScanUploadProxy").Bind,
-    builder =>
-    {
-        builder.AddStandardResilienceHandler();
-    }
-);
-
-builder.Services.AddScanUploadApiClient(
-    builder.Configuration,
-    builder =>
-    {
-        builder.AddStandardResilienceHandler();
-    }
-);
-```
-
-## Enable the ScanUpload proxy middleware
-Add the middleware after routing and before endpoints:
-```csharp
-app.UseScanUploadProxy();
-```
-
-## Minimal `Program.cs` example
 ```csharp
 using ScanUpload.Api.Client.Extensions;
-using ScanUpload.Api.Client.Interface;
-using ScanUpload.Api.Client.KeycloakIntegration;
 
-var builder = WebApplication.CreateBuilder(args);
-
-builder.Services.Configure<ScanUploadProxyOptions>(
-    builder.Configuration.GetSection("ScanUploadProxy")
-);
-
-builder.Services.AddScanUploadProxy(
-    builder.Configuration.GetSection("ScanUploadProxy").Bind,
-    builder =>
-    {
-        builder.AddStandardResilienceHandler();
-    }
-);
-
-builder.Services.AddScanUploadApiClient(
-    builder.Configuration,
-    builder =>
-    {
-        builder.AddStandardResilienceHandler();
-    }
-);
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-app.UseHttpsRedirection();
-app.UseAuthorization();
-
-app.UseScanUploadProxy();
-
-app.MapControllers();
-
-app.Run();
-
+builder.Services.AddScanUploadApiClient(builder.Configuration);
 ```
 
-## Compatibility notes
+The following backend endpoint, based on `ScanUpload.Api.Client.Test`, downloads a
+session and writes every received file to an `output` directory:
 
--   The client targets **.NET Standard 2.1**
--   Works with both **modern** and **older** ASP.NET Core applications
--   Safe to use in long‑term support (LTS) environments
--   Fully compatible with Docker and cloud deployments
+```csharp
+using ScanUpload.Api.Client.ApiClient;
 
-## Resilience and reliability (Optional)
+app.MapGet("/download-file/{sessionId}", async (
+	string sessionId,
+	IScanUploadApiClient client,
+	CancellationToken ct) =>
+{
+	var outputDir = Path.Combine(Environment.CurrentDirectory, "output");
+	Directory.CreateDirectory(outputDir);
 
-The client integrates with **Microsoft.Extensions.Http.Resilience**, providing:
+	await client.DownloadAsync(sessionId, async (fileName, stream, cancellation) =>
+	{
+		Console.WriteLine($"Received file: {fileName}");
+		await using var file = File.Create(Path.Combine(outputDir, fileName));
+		await stream.CopyToAsync(file, cancellation);
+	}, ct);
 
--   Automatic retries  
--   Timeouts 
--   Circuit breakers
--   Transient fault handling
-    
-This ensures reliable communication with the ScanUpload API in production.
+	return Results.Ok(new { savedTo = outputDir });
+});
+```
+
+`DownloadAsync` streams the downloaded archive and invokes the callback for each file.
+The backend can save each file locally, send it to blob storage, or process it directly.
